@@ -1,0 +1,29 @@
+# Cohort retention | Brazilian e-commerce
+
+## Method
+
+The source is the [Olist Brazilian E-Commerce Public Dataset](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce). I joined `olist_orders` to `olist_customers` on `customer_id`, restricted the population to `delivered` orders, and used the purchase timestamp for the calendar month. An individual's cohort is the month of their first **delivered** purchase in this data. The cohort therefore does not include a prior cancelled or unavailable purchase.
+
+`customer_id` identifies an order-level customer record; `customer_unique_id` links records belonging to the same person. Cohorting on `customer_id` would make most later orders appear to be purchases by new customers and would flatten the repeat-purchase curve. I counted distinct `customer_unique_id` in each cohort and calendar month. Multiple purchases within one month add only one active customer. Period 0 is each cohort's first month and equals 100% by construction; a later month's denominator remains that cohort's period-0 population.
+
+The observation window for delivered purchases ends in **August 2018**. A zero marks a fully observed month with no returning customers, whereas a blank marks a month beyond the observed window. Q8 reports the mean across **all observed cohorts** as well as a stable comparison from January 2017 onward with at least 500 people. The curve and month-1 ranking use that stable comparison, excluding very small 2016 cohorts. Each plotted period uses only cohorts that have reached that period. Consequently the period-6 average is based on fewer cohorts than period 1; the curve is a set of period-specific cross-cohort averages, rather than a survival curve for one fixed population.
+
+The CSVs contain **99,441 orders**, including **96,478 delivered orders** from **93,358 unique people**. These are order counts, not the number of joined item/review rows. `order_items` and `order_reviews` each have one-to-many possibilities. I aggregate their records by `order_id` before attaching them to customer-level analysis; joining all three raw tables first would inflate counts and revenue. Revenue here means item `price` in BRL, excludes freight, and has no cost or refund adjustment.
+
+## Business insights
+
+1. **The second calendar month is the steepest break.** Month 0 is 100% by definition, but average month-1 retention is **0.4757%** across **19** comparable cohorts, a decline of **99.5243 percentage points**. The size-weighted month-1 value is **0.4830%**. The unfiltered all-cohort mean (**4.9563%**) is distorted by a one-person cohort, illustrating why sample sizes matter. This marketplace shows **weak immediate repeat purchasing**: fewer than one in 200 acquired buyers in the stable comparison placed a delivered order in the following calendar month. It does not prove those customers never buy again; a buyer can skip month 1 and return later.
+
+2. **Acquisition scale did not translate into month-1 frequency.** The largest cohort, **2017-11**, contains **7,060** customers. Across the stable curve, period 2 averages **0.3370%** and period 6 averages **0.2613%**, with 18 and 14 observable cohorts respectively. These later rates cannot be read as a monotonic path for identical cohorts: eligible cohorts change with the period, and monthly active purchasing need not be continuous. Growth and repeat buying should be monitored as separate outcomes.
+
+3. **Cohort ranking merits a test before a story.** The highest observed month-1 rate among the comparable cohorts is **2017-10: 31/4,328 = 0.7163%**; the lowest is **2017-02: 3/1,628 = 0.1843%**. I tested the hypothesis that worse initial delivery experience explains the weaker cohort. The data **do not support it**: the weaker cohort's first-order late-delivery share is **3.19%** versus **5.41%** for the stronger cohort, and mean first-order reviews are almost equal (**4.201** versus **4.202**). As an alternative to examine, next-month marketplace volume grew **62.8%** from Oct to Nov 2017 versus **54.0%** from Feb to Mar 2017. This is consistent with some seasonal difference in buying opportunities, but it cannot identify promotion exposure or establish why individual customers returned.
+
+4. **Post-purchase service has a separate measurable signal.** Among reviewed, delivered orders with both delivery dates, late deliveries average **2.567/5** across **7,661** orders; on-time deliveries average **4.294/5** across **88,163**. The low-rating shares are **53.99%** and **9.19%**, respectively. This association justifies investigating delivery performance as a customer-experience issue, although the best-versus-worst cohort comparison above provides no evidence that it explains their retention gap.
+
+## Reading the five visuals
+
+- The retention heatmap gives month 0 its own neutral strip so the 100% acquisition baseline does not conceal the much smaller repeat rates. It shows cohorts with at least 500 buyers; the full 23-row matrix is in Q7. Blank cells are unobserved.
+- The retention curve separates the 100%-to-month-1 fall from the sub-1% detail at later periods; the sample size beside each point changes with maturity.
+- The cohort-size bars represent distinct people at acquisition, including the tiny 2016 cohorts.
+- The month-1 ranking includes actual returning-customer numerators alongside percentages, making small denominators easier to spot.
+- The revenue bubbles show **incremental item revenue per original cohort customer**, not revenue retention as a percentage; acquisition-month revenue is excluded from bubble colours to preserve scale. The SQL also returns six-period cumulative revenue per original customer.
