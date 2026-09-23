@@ -1,8 +1,3 @@
--- cohort retention | mysql 8.0+
--- run setup_mysql.sql once, then run these queries one at a time.
--- p0 is 100%; null means the month is not yet observable.
-
-
 -- Q1: checking delivered orders and the number of unique customers.
 select count(*) as delivered_orders,
        count(distinct c.customer_unique_id) as unique_customers,
