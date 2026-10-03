@@ -1,7 +1,8 @@
 create database if not exists olist_cohort;
 use olist_cohort;
 
-
+-- run this file with local infile enabled; replace the five paths below with your own csv folder
+-- example: C:/Users/your_name/Downloads/olist_orders_dataset.csv
 set global local_infile = 1;
 
 create table if not exists olist_customers (
