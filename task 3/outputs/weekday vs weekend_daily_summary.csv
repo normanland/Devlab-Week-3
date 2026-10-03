@@ -1,0 +1,3 @@
+day_type,count,mean,median,min,max
+Weekday,130,7961.1,8010.5,5523,9204
+Weekend,52,7939.6,8085.0,1627,9714
