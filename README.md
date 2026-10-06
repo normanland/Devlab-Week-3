@@ -1,4 +1,4 @@
-# DevLab Week 3 — Following Signals Through Time
+# Devlab Week 3 — Following Signals Through Time
 
 Three datasets.  
 Three operational questions.  
